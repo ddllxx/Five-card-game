@@ -1,11 +1,17 @@
 package comp1721.cwk2;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Objects;
 
 // Implement PokerHand class here
 public class PokerHand {
     LinkedList<String> PokerHand = new LinkedList<>();
+    int two = 0;
+    int three = 0;
+    int four = 0;
+    boolean flush = false;
+    boolean st = false;
 
     public PokerHand() {
     }
@@ -26,9 +32,11 @@ public class PokerHand {
         StringBuilder m = new StringBuilder();
         for (int i = 0; i < PokerHand.size(); i++) {
             if (i == PokerHand.size() - 1) {
-                m.append(PokerHand.get(i));
+                Card c = new Card(PokerHand.get(i));
+                m.append(c);
             } else {
-                m.append(PokerHand.get(i));
+                Card c = new Card(PokerHand.get(i));
+                m.append(c);
                 m.append(" ");
             }
         }
@@ -57,32 +65,69 @@ public class PokerHand {
     }
 
     public boolean isPair() {
+        if (this.isfivecard()) {
+            this.divideranksandsuits();
+            return two == 1 && three == 0 && four == 0;
+        } else {
+            return false;
+        }
 
-        return false;
     }
 
     public boolean isTwoPairs() {
-        return false;
+        if (this.isfivecard()) {
+            this.divideranksandsuits();
+            return two == 2 && three == 0 && four == 0;
+        } else {
+            return false;
+        }
+
     }
 
     public boolean isThreeOfAKind() {
-        return false;
+        if (this.isfivecard()) {
+            this.divideranksandsuits();
+            return two == 0 && three == 1 && four == 0;
+        } else {
+            return false;
+        }
     }
 
     public boolean isFourOfAKind() {
-        return false;
+        if (this.isfivecard()) {
+            this.divideranksandsuits();
+            return two == 0 && three == 0 && four == 1;
+        } else {
+            return false;
+        }
+
     }
 
     public boolean isFullHouse() {
-        return false;
+        if (this.isfivecard()) {
+            this.divideranksandsuits();
+            return two == 1 && three == 1 && four == 0;
+        } else {
+            return false;
+        }
     }
 
     public boolean isFlush() {
-        return false;
+        if (this.isfivecard()) {
+            this.divideranksandsuits();
+            return flush;
+        } else {
+            return false;
+        }
     }
 
     public boolean isStraight() {
-        return false;
+        if (this.isfivecard()) {
+            this.divideranksandsuits();
+            return st;
+        } else {
+            return false;
+        }
     }
 
     public void add(Card deal) {
@@ -100,4 +145,69 @@ public class PokerHand {
             PokerHand.add(deal.toString());
         }
     }
+
+    public void divideranksandsuits() {
+        StringBuilder all = new StringBuilder();
+        StringBuilder rank = new StringBuilder();
+        StringBuilder suit = new StringBuilder();
+        StringBuilder straight = new StringBuilder();
+        for (int i = 0; i < PokerHand.size(); i++) {
+            all.append(PokerHand.get(i));
+        }
+        for (int m = 0; m < all.toString().length() / 2; m++) {
+            rank.append(all.charAt(2 * m));
+            suit.append(all.charAt(2 * m + 1));
+        }
+        for (int k = 0; k < rank.length(); k++) {
+            if (k + 3 < rank.length() && (rank.charAt(k) == rank.charAt(k + 3))) {
+                four++;
+                break;
+            } else if (k + 2 < rank.length() && (rank.charAt(k) == rank.charAt(k + 2))) {
+                three++;
+                k = k + 2;
+            } else if (k + 1 < rank.length() && rank.charAt(k) == rank.charAt(k + 1)) {
+                two++;
+                k = k + 1;
+            }
+        }
+        for (int k = 1, b = 0; k < suit.length(); k++) {
+            if (suit.charAt(k) == suit.charAt(0)) {
+                b++;
+            }
+            if (b == suit.length() - 1)
+                flush = true;
+        }
+        int[] e = new int[5];
+        int sum = 0;
+        for (int i = 0; i < rank.length(); i++) {
+            if (rank.charAt(i) == 'A') {
+                e[i] = 1;
+            } else if (rank.charAt(i) == 'T') {
+                e[i] = 10;
+            } else if (rank.charAt(i) == 'J') {
+                e[i] = 11;
+            } else if (rank.charAt(i) == 'Q') {
+                e[i] = 12;
+            } else if (rank.charAt(i) == 'K') {
+                e[i] = 13;
+            } else {
+                e[i] = rank.charAt(i) - '0';
+            }
+        }
+
+        for (int mm = 0; mm < e.length; mm++) {
+            sum += e[mm];
+        }
+        Arrays.sort(e);
+        if (e[0] != 0 && sum == e[0] * 5 + 10) {
+            st = true;
+        } else if (e[0] == 1 && sum == 47) {
+            st = true;
+        }
+    }
+
+    public boolean isfivecard() {
+        return PokerHand.size() == 5;
+    }
 }
+
