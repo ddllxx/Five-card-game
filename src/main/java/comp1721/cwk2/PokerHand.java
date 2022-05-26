@@ -6,12 +6,12 @@ import java.util.Objects;
 
 // Implement PokerHand class here
 public class PokerHand {
-    LinkedList<String> PokerHand = new LinkedList<>();
-    int two = 0;
-    int three = 0;
-    int four = 0;
-    boolean flush = false;
-    boolean st = false;
+    protected LinkedList<Card> poker = new LinkedList<>();
+    private int two = 0;
+    private int three = 0;
+    private int four = 0;
+    private boolean flush = false;
+    private boolean st = false;
 
     public PokerHand() {
     }
@@ -22,46 +22,65 @@ public class PokerHand {
 
         } else {
             for (int n = 0; n < (string.length() + 1) / 3; n++) {
-                PokerHand.add(String.valueOf(string.charAt(3 * n)) + string.charAt(3 * n + 1));
+                String a = String.valueOf(string.charAt(3 * n)) + string.charAt(3 * n + 1);
+                poker.add(new Card(a));
             }
         }
     }
 
     @Override
     public String toString() {
-        StringBuilder m = new StringBuilder();
-        for (int i = 0; i < PokerHand.size(); i++) {
-            if (i == PokerHand.size() - 1) {
-                Card c = new Card(PokerHand.get(i));
-                m.append(c);
-            } else {
-                Card c = new Card(PokerHand.get(i));
-                m.append(c);
-                m.append(" ");
-            }
+        String a = "";
+        if (poker.size() == 0) {
+            return a;
         }
-        return m.toString();
+        a = poker.get(0).toString();
+        for (int i = 1; i < poker.size(); i++) {
+            a = a.concat(" " + poker.get(i).toString());
+        }
+        return a;
     }
 
     public int size() {
-        return PokerHand.size();
+        return poker.size();
     }
 
     public void discard() {
-        if (PokerHand.size() == 0) {
+        if (poker.size() == 0) {
             throw new CardException("Wrong!");
         } else {
-            PokerHand.clear();
+            poker.clear();
         }
     }
 
     public void discardTo(Deck d) {
-        if (PokerHand.size() == 0) {
+        if (poker.size() == 0) {
             throw new CardException("Wrong!");
         } else {
-            d.deck.addAll(PokerHand);
-            PokerHand.clear();
+            d.deck.addAll(poker);
+            poker.clear();
         }
+    }
+
+    public int[] ranks() {
+        int[] e = new int[5];
+        for (int i = 0; i < poker.size(); i++) {
+            if (poker.get(i).toString().charAt(0) == 'A') {
+                e[i] = 1;
+            } else if (poker.get(i).toString().charAt(0) == 'T') {
+                e[i] = 10;
+            } else if (poker.get(i).toString().charAt(0) == 'J') {
+                e[i] = 11;
+            } else if (poker.get(i).toString().charAt(0) == 'Q') {
+                e[i] = 12;
+            } else if (poker.get(i).toString().charAt(0) == 'K') {
+                e[i] = 13;
+            } else {
+                e[i] = poker.get(i).toString().charAt(0) - '0';
+            }
+        }
+        Arrays.sort(e);
+        return e;
     }
 
     public boolean isPair() {
@@ -76,8 +95,14 @@ public class PokerHand {
 
     public boolean isTwoPairs() {
         if (this.isfivecard()) {
-            this.divideranksandsuits();
-            return two == 2 && three == 0 && four == 0;
+            int[] e = ranks();
+            if (e[0] == e[1] && e[2] == e[3] && e[3] != e[4] && e[1] != e[2]) {
+                return true;
+            } else if (e[0] != e[1] && e[1] == e[2] && e[2] != e[3] && e[3] == e[4]) {
+                return true;
+            } else {
+                return e[0] == e[1] && e[1] != e[2] && e[2] != e[3] && e[3] == e[4];
+            }
         } else {
             return false;
         }
@@ -86,17 +111,28 @@ public class PokerHand {
 
     public boolean isThreeOfAKind() {
         if (this.isfivecard()) {
-            this.divideranksandsuits();
-            return two == 0 && three == 1 && four == 0;
+            int[] e = ranks();
+            if (e[0] == e[2] && e[0] != e[3] && e[3] != e[4]) {
+                return true;
+            } else if (e[0] != e[1] && e[1] == e[3] && e[3] != e[4]) {
+                return true;
+            } else {
+                return e[0] != e[1] && e[1] != e[2] && e[2] == e[4];
+            }
         } else {
             return false;
         }
     }
 
     public boolean isFourOfAKind() {
+
         if (this.isfivecard()) {
-            this.divideranksandsuits();
-            return two == 0 && three == 0 && four == 1;
+            int[] e = ranks();
+            if (e[0] == e[3] && e[3] != e[4]) {
+                return true;
+            } else {
+                return e[0] != e[1] && e[1] == e[4];
+            }
         } else {
             return false;
         }
@@ -105,8 +141,12 @@ public class PokerHand {
 
     public boolean isFullHouse() {
         if (this.isfivecard()) {
-            this.divideranksandsuits();
-            return two == 1 && three == 1 && four == 0;
+            int[] e = ranks();
+            if (e[0] == e[2] && e[2] != e[3] && e[3] == e[4]) {
+                return true;
+            } else {
+                return e[0] == e[1] && e[1] != e[4] && e[2] == e[4];
+            }
         } else {
             return false;
         }
@@ -131,18 +171,18 @@ public class PokerHand {
     }
 
     public void add(Card deal) {
-        if (PokerHand.size() == 0) {
-            PokerHand.add(deal.toString());
+        if (poker.size() == 0) {
+            poker.add(deal);
 
-        } else if (PokerHand.size() == 5) {
+        } else if (poker.size() == 5) {
             throw new CardException("wrong!");
         } else {
-            for (String s : PokerHand) {
-                if (Objects.equals(deal.toString(), s)) {
+            for (Card s : poker) {
+                if (Objects.equals(deal.toString(), s.toString())) {
                     throw new CardException("wrong!");
                 }
             }
-            PokerHand.add(deal.toString());
+            poker.add(deal);
         }
     }
 
@@ -150,32 +190,12 @@ public class PokerHand {
         StringBuilder all = new StringBuilder();
         StringBuilder rank = new StringBuilder();
         StringBuilder suit = new StringBuilder();
-        StringBuilder straight = new StringBuilder();
-        for (int i = 0; i < PokerHand.size(); i++) {
-            all.append(PokerHand.get(i));
+        for (Card s : poker) {
+            all.append(s.toString());
         }
         for (int m = 0; m < all.toString().length() / 2; m++) {
             rank.append(all.charAt(2 * m));
             suit.append(all.charAt(2 * m + 1));
-        }
-        for (int k = 0; k < rank.length(); k++) {
-            if (k + 3 < rank.length() && (rank.charAt(k) == rank.charAt(k + 3))) {
-                four++;
-                break;
-            } else if (k + 2 < rank.length() && (rank.charAt(k) == rank.charAt(k + 2))) {
-                three++;
-                k = k + 2;
-            } else if (k + 1 < rank.length() && rank.charAt(k) == rank.charAt(k + 1)) {
-                two++;
-                k = k + 1;
-            }
-        }
-        for (int k = 1, b = 0; k < suit.length(); k++) {
-            if (suit.charAt(k) == suit.charAt(0)) {
-                b++;
-            }
-            if (b == suit.length() - 1)
-                flush = true;
         }
         int[] e = new int[5];
         int sum = 0;
@@ -194,20 +214,41 @@ public class PokerHand {
                 e[i] = rank.charAt(i) - '0';
             }
         }
-
-        for (int mm = 0; mm < e.length; mm++) {
-            sum += e[mm];
+        for (int i : e) {
+            sum += i;
         }
         Arrays.sort(e);
-        if (e[0] != 0 && sum == e[0] * 5 + 10) {
+
+        for (int k = 0; k < e.length; k++) {
+            if (k + 3 < e.length && (e[k] == e[k + 3])) {
+                four++;
+                break;
+            } else if (k + 2 < e.length && (e[k] == e[k + 2])) {
+                three++;
+                k = k + 2;
+            } else if (k + 1 < e.length && (e[k] == e[k + 1])) {
+                two++;
+                k = k + 1;
+            }
+        }
+        if (e[0] != 0 && sum == e[0] * 5 + 10 && two + three + four == 0) {
             st = true;
-        } else if (e[0] == 1 && sum == 47) {
+        } else if (e[0] == 1 && e[1] == 10 && e[2] == 11 && e[3] == 12 && e[4] == 13) {
             st = true;
         }
+        for (int k = 1, b = 0; k < suit.length(); k++) {
+            if (suit.charAt(k) == suit.charAt(0)) {
+                b++;
+            }
+            if (b == suit.length() - 1) {
+                flush = true;
+            }
+        }
+
     }
 
     public boolean isfivecard() {
-        return PokerHand.size() == 5;
+        return poker.size() == 5;
     }
 }
 

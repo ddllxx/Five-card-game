@@ -6,7 +6,7 @@ import java.util.LinkedList;
 
 // Implement Deck class here
 public class Deck {
-    LinkedList<String> deck = new LinkedList<>();
+    protected LinkedList<Card> deck = new LinkedList<>();
 
     public Deck() {
         ArrayList<String> suit = new ArrayList<>();
@@ -30,7 +30,7 @@ public class Deck {
                 } else {
                     n = i + "";
                 }
-                deck.add(n + suit.get(s));
+                deck.add(new Card(n + suit.get(s)));
             }
         }
     }
@@ -45,8 +45,8 @@ public class Deck {
 
     public boolean contains(Card m) throws CardException {
         boolean re = false;
-        for (String s : deck) {
-            if (m.toString().equals(s)) {
+        for (Card s : deck) {
+            if (m.toString().equals(s.toString())) {
                 re = true;
                 break;
             }
@@ -67,9 +67,7 @@ public class Deck {
         if (deck.size()==0) {
             throw new CardException("Wrong!");
         } else {
-            String a = deck.getFirst();
-            deck.pollFirst();
-            return new Card(a);
+            return deck.pollFirst();
         }
     }
 
@@ -78,6 +76,6 @@ public class Deck {
     }
 
     public void add(Card card) throws CardException {
-        deck.add(String.valueOf(card));
+        deck.add(card);
     }
 }
