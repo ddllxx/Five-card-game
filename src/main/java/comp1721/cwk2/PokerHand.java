@@ -3,19 +3,24 @@ package comp1721.cwk2;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Objects;
-
-// Implement PokerHand class here
+/**
+ *PokerHand class represent a hand of cards in a game of five-card draw poker
+ */
 public class PokerHand {
+    /**
+     *A linked list of poker on the hand
+     */
     protected LinkedList<Card> poker = new LinkedList<>();
-    private int two = 0;
-    private int three = 0;
-    private int four = 0;
-    private boolean flush = false;
     private boolean st = false;
-
+    /**
+     *A default constructor that creates an empty hand.
+     */
     public PokerHand() {
     }
-
+    /**
+     *A constructor with a String parameter that specifies the cards that should be added to the hand
+     * @param string a String that specifies the cards that should be added to the hand
+     */
     public PokerHand(String string) {
         if (string.length() > 14 || string.length() < 2) {
             throw new CardException("");
@@ -27,7 +32,10 @@ public class PokerHand {
             }
         }
     }
-
+    /**
+     *toString() returns a string in which cards are shown in two-character form, separated by spaces
+     * @return a string in which cards are shown in two-character form, separated by spaces
+     */
     @Override
     public String toString() {
         String a = "";
@@ -40,11 +48,16 @@ public class PokerHand {
         }
         return a;
     }
-
+    /**
+     *size() returns the number of cards in the hand
+     * @return the number of cards in the hand
+     */
     public int size() {
         return poker.size();
     }
-
+    /**
+     *discard() empties all cards in the hand.
+     */
     public void discard() {
         if (poker.size() == 0) {
             throw new CardException("Wrong!");
@@ -52,7 +65,10 @@ public class PokerHand {
             poker.clear();
         }
     }
-
+    /**
+     *discardTo(Deck d) empties the hand of cards and returns each of them to the specified deck
+     *@param d the deck to be discarded
+     */
     public void discardTo(Deck d) {
         if (poker.size() == 0) {
             throw new CardException("Wrong!");
@@ -61,7 +77,10 @@ public class PokerHand {
             poker.clear();
         }
     }
-
+    /**
+     *The ranks method gets the rank of all hands and stores it in an array and returns
+     * @return an array of the rank of all hands
+     */
     public int[] ranks() {
         int[] e = new int[5];
         for (int i = 0; i < poker.size(); i++) {
@@ -82,17 +101,43 @@ public class PokerHand {
         Arrays.sort(e);
         return e;
     }
+    /**
+     *The suits method gets the suit of all hands and stores it in an array and returns
+     * @return an array of the suit of all hands
+     */
+    public int[] suits() {
+        int[] e = new int[5];
+        for (int i = 0; i < poker.size(); i++) {
+            e[i] = poker.get(i).toString().charAt(1) - '0';
+        }
+        return e;
 
+    }
+    /**
+     *Determining if the hand poker is a poker with a pair
+     * @return the result of if the hand poker is a poker with a pair
+     */
     public boolean isPair() {
         if (this.isfivecard()) {
-            this.divideranksandsuits();
-            return two == 1 && three == 0 && four == 0;
+            int[] e = ranks();
+            if (e[0] == e[1] && e[1] != e[2] && e[2] != e[3] && e[3] != e[4]) {
+                return true;
+            } else if (e[0] != e[1] && e[1] == e[2] && e[2] != e[3] && e[3] != e[4]) {
+                return true;
+            } else if (e[0] != e[1] && e[1] != e[2] && e[2] == e[3] && e[3] != e[4]) {
+                return true;
+            } else {
+                return e[0] != e[1] && e[1] != e[2] && e[2] != e[3] && e[3] == e[4];
+            }
         } else {
             return false;
         }
 
     }
-
+     /**
+     *Determining if the hand poker is a poker with TwoPairs
+      *@return the result of if the hand poker is a poker with TwoPairs
+     */
     public boolean isTwoPairs() {
         if (this.isfivecard()) {
             int[] e = ranks();
@@ -108,7 +153,10 @@ public class PokerHand {
         }
 
     }
-
+    /**
+     *Determining if the hand poker is a poker with Three Of A Kind
+     *@return the result of if the hand poker is a poker with Three Of A Kind
+     */
     public boolean isThreeOfAKind() {
         if (this.isfivecard()) {
             int[] e = ranks();
@@ -123,7 +171,10 @@ public class PokerHand {
             return false;
         }
     }
-
+    /**
+     *Determining if the hand poker is a poker with Four Of A Kind
+     *@return the result of if the hand poker is a poker with Four Of A Kind
+     */
     public boolean isFourOfAKind() {
 
         if (this.isfivecard()) {
@@ -138,7 +189,10 @@ public class PokerHand {
         }
 
     }
-
+    /**
+     *Determining if the hand poker is a poker with Full House
+     *@return the result of if the hand poker is a poker with Full House
+     */
     public boolean isFullHouse() {
         if (this.isfivecard()) {
             int[] e = ranks();
@@ -151,25 +205,51 @@ public class PokerHand {
             return false;
         }
     }
-
+    /**
+     *Determining if the hand poker is a poker with Flush
+     *@return the result of if the hand poker is a poker with Flush
+     */
     public boolean isFlush() {
         if (this.isfivecard()) {
-            this.divideranksandsuits();
-            return flush;
+            int[] suit = suits();
+            int b = 0;
+            for (int k = 1; k < suit.length; k++) {
+                if (suit[k] == suit[0]) {
+                    b++;
+                }
+            }
+            return b == suit.length - 1;
+
         } else {
             return false;
         }
     }
-
+    /**
+     *Determining if the hand poker is a poker with Straight
+     * @return the result of if the hand poker is a poker with Straight
+     */
     public boolean isStraight() {
         if (this.isfivecard()) {
-            this.divideranksandsuits();
+            int sum = 0;
+            int[] e = ranks();
+            for (int i : e) {
+                sum += i;
+            }
+            if (e[0] != 0 && sum == e[0] * 5 + 10 && e[0] == e[1] - 1 && e[1] == e[2] - 1
+                    && e[2] == e[3] - 1 && e[3] == e[4] - 1) {
+                st = true;
+            } else if (e[0] == 1 && e[1] == 10 && e[2] == 11 && e[3] == 12 && e[4] == 13) {
+                st = true;
+            }
             return st;
         } else {
             return false;
         }
     }
-
+    /**
+     *add() returns the card to the pocker
+     * @param  deal a card to be added
+     */
     public void add(Card deal) {
         if (poker.size() == 0) {
             poker.add(deal);
@@ -185,68 +265,10 @@ public class PokerHand {
             poker.add(deal);
         }
     }
-
-    public void divideranksandsuits() {
-        StringBuilder all = new StringBuilder();
-        StringBuilder rank = new StringBuilder();
-        StringBuilder suit = new StringBuilder();
-        for (Card s : poker) {
-            all.append(s.toString());
-        }
-        for (int m = 0; m < all.toString().length() / 2; m++) {
-            rank.append(all.charAt(2 * m));
-            suit.append(all.charAt(2 * m + 1));
-        }
-        int[] e = new int[5];
-        int sum = 0;
-        for (int i = 0; i < rank.length(); i++) {
-            if (rank.charAt(i) == 'A') {
-                e[i] = 1;
-            } else if (rank.charAt(i) == 'T') {
-                e[i] = 10;
-            } else if (rank.charAt(i) == 'J') {
-                e[i] = 11;
-            } else if (rank.charAt(i) == 'Q') {
-                e[i] = 12;
-            } else if (rank.charAt(i) == 'K') {
-                e[i] = 13;
-            } else {
-                e[i] = rank.charAt(i) - '0';
-            }
-        }
-        for (int i : e) {
-            sum += i;
-        }
-        Arrays.sort(e);
-
-        for (int k = 0; k < e.length; k++) {
-            if (k + 3 < e.length && (e[k] == e[k + 3])) {
-                four++;
-                break;
-            } else if (k + 2 < e.length && (e[k] == e[k + 2])) {
-                three++;
-                k = k + 2;
-            } else if (k + 1 < e.length && (e[k] == e[k + 1])) {
-                two++;
-                k = k + 1;
-            }
-        }
-        if (e[0] != 0 && sum == e[0] * 5 + 10 && two + three + four == 0) {
-            st = true;
-        } else if (e[0] == 1 && e[1] == 10 && e[2] == 11 && e[3] == 12 && e[4] == 13) {
-            st = true;
-        }
-        for (int k = 1, b = 0; k < suit.length(); k++) {
-            if (suit.charAt(k) == suit.charAt(0)) {
-                b++;
-            }
-            if (b == suit.length() - 1) {
-                flush = true;
-            }
-        }
-
-    }
-
+    /**
+     *isfivecard() determine if the hand has 5 cards
+     * @return the result of if the hand has 5 cards
+     */
     public boolean isfivecard() {
         return poker.size() == 5;
     }

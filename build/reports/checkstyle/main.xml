@@ -9,8 +9,6 @@
 <file name="C:\Users\86185\Desktop\JavaCWK2\src\main\java\comp1721\cwk2\Deck.java">
 </file>
 <file name="C:\Users\86185\Desktop\JavaCWK2\src\main\java\comp1721\cwk2\PokerHand.java">
-<error line="228" column="19" severity="warning" message="循环控制变量 &apos;k&apos; 不应在循环体内修改。" source="com.puppycrawl.tools.checkstyle.checks.coding.ModifiedControlVariableCheck"/>
-<error line="231" column="19" severity="warning" message="循环控制变量 &apos;k&apos; 不应在循环体内修改。" source="com.puppycrawl.tools.checkstyle.checks.coding.ModifiedControlVariableCheck"/>
 </file>
 <file name="C:\Users\86185\Desktop\JavaCWK2\src\main\java\comp1721\cwk2\PokerStats.java">
 </file>
